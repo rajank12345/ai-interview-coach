@@ -8,9 +8,12 @@ type Message = { role: "interviewer" | "candidate"; content: string };
 type Report = { score: number; strengths: string[]; weaknesses: string[]; topics_to_revise: string[]; verdict: string; result: "PASS" | "FAIL" };
 type Screen = "start" | "interview" | "report";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "");
 
 async function api<T>(path: string, body: unknown): Promise<T> {
+  if (!API_URL) {
+    throw new Error("The API URL is not configured. Set NEXT_PUBLIC_API_URL and redeploy the frontend.");
+  }
   const response = await fetch(`${API_URL}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.detail || "Something went wrong. Please try again.");

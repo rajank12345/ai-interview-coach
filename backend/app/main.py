@@ -14,7 +14,7 @@ from .services import AIServiceError, InterviewService
 async def lifespan(app: FastAPI):
     settings = get_settings()
     status = "configured" if settings.groq_api_key and settings.groq_api_key != "your_groq_api_key_here" else "API key missing"
-    print(f"\nAI Interview Coach API ready at http://localhost:8000 ({status})\n")
+    print(f"\nAI Interview Coach API ready ({status})\n")
     yield
 
 
@@ -46,6 +46,15 @@ def service(config: Settings = Depends(get_settings)) -> InterviewService:
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "ai-interview-coach"}
+
+
+@app.get("/")
+async def root():
+    return {
+        "status": "ok",
+        "service": "ai-interview-coach",
+        "message": "AI Interview Coach API is running",
+    }
 
 
 @app.post("/api/interview/start", response_model=InterviewReply)
